@@ -29,7 +29,7 @@ of both of the boards showing the modifications and connection test points.
 See [MR200G1_TP](docs/AEK-MOT-MR200G1_TP.png) and [TK200G1_TP](docs/AEK-MOT-TK200G1_TP.png)
 for the images of both of the boards showing the connection test points.
 
-See [MR200/TK200](docs/MR200_TK200-MCU Wiring.pdf) showing the connections used for tesing
+See [MR200/TK200]("docs/MR200_TK200-MCU%20Wiring.pdf") showing the connections used for tesing
 this Arduino library with these boards.
 
 
