@@ -22,7 +22,7 @@ the MCU's PORST input.
 
 Once the onboard MCU was disabled, an external Arduino-based MCU board (an Arduino Nano,
 or Arduino Nano Every or Teensy 3.1) was connected to various test points on the AEK-MOT-MR200G1
-and AEK-MOT-TK200G1 boards to provide various connectivity to the L99DZ200G device.
+and AEK-MOT-TK200G1 boards to provide various connectivity to control the L99DZ200G device.
 
 Additionally, in order for the external Arduino-based MCU board to manage the appropriate
 wake-up from the sleep modes of the L99DZ200G device, a MOSFET transistor was added to the
