@@ -4,9 +4,10 @@ Arduino library for L99DZ200G Automotive Front Door Device Controller from STMic
 This Arduino library has been developed for the 
 [L99DZ200G](https://www.st.com/en/automotive-analog-and-power/l99dz200g.html)
 **_"Automotive Front Door device"_** using Arduino 1.8.13 and Teensyduino 1.56 using
-the STMicro [AEK-MOT-MR200G1](https://www.st.com/en/evaluation-tools/aek-mot-mr200g1.html)
+the STMicro Evaluation Boards:
+- [AEK-MOT-MR200G1](https://www.st.com/en/evaluation-tools/aek-mot-mr200g1.html)
 **_"Vehicle mirror controller board based on L99DZ200G multioutput driver"_** and
-[AEK-MOT-TK200G1](https://www.st.com/en/evaluation-tools/aek-mot-tk200g1.html)
+- [AEK-MOT-TK200G1](https://www.st.com/en/evaluation-tools/aek-mot-tk200g1.html)
 **_"Power liftgate controller board based on L99DZ200G multioutput driver"_**.
 
 **[Vehicle mirror controller](docs/AEK-MOT-MR200G1_Block.PNG)**
