@@ -23,7 +23,10 @@ wake-up from the sleep modes of the L99DZ200G device, a MOSFET transistor was ad
 boards to parallel the board's WAKE pushbutton.
 
 See [MR200G1](docs/MR200G1_.S01.pdf) and [TK200G1](docs/TK200G1_.S01.pdf) for the schematics
-of the boards showing the modifications and connection test points.
+of both of the boards showing the modifications and connection test points.
+
+See [MR200G1_TP](docs/AEK-MOT-MR200G1_TP.png) and [TK200G1_TP](docs/AEK-MOT-TK200G1_TP.png)
+for the images of both of the boards showing the connection test points.
 
 
 
