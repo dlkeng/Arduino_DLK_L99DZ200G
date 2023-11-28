@@ -13,8 +13,8 @@ the STMicro [AEK-MOT-MR200G1](https://www.st.com/en/evaluation-tools/aek-mot-mr2
 
 **[Power liftgate controller](docs/AEK-MOT-TK200G1_Diagram.png)**
 
-The AEK-MOT-MR200G1 {[picture](docs/AEK-MOT-MR200G1.png)} and AEK-MOT-TK200G1
-{[picture](docs/AEK-MOT-TK200G1.png)} boards each have a controlling MCU on the boards,
+The AEK-MOT-MR200G1 ([picture](docs/AEK-MOT-MR200G1.png)) and AEK-MOT-TK200G1
+([picture](docs/AEK-MOT-TK200G1.png)) boards each have a controlling MCU on the boards,
 but this MCU was disabled by connecting the reset pin (Pin 9) of the JTAG connector to
 ground (Pin 2) and removing an inline resistor between the L99DZ200G NRESET output and
 the MCU's PORST input.
@@ -36,4 +36,4 @@ for the images of both of the boards showing the connection test points.
 See [MR200/TK200](docs/MR200_TK200-MCU%20Wiring.pdf) showing the connections used for tesing
 this Arduino library with these boards.
 
-
+Doxygen-based HTML files for the library are in: **[API Docs](docs/html/class_d_l_k___l99_d_z200_g.html)**
