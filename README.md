@@ -9,7 +9,7 @@ the STMicro [AEK-MOT-MR200G1](https://www.st.com/en/evaluation-tools/aek-mot-mr2
 [AEK-MOT-TK200G1](https://www.st.com/en/evaluation-tools/aek-mot-tk200g1.html)
 **_"Power liftgate controller board based on L99DZ200G multioutput driver"_**.
 
-[Vehicle mirror controller](docs/AEK-MOT-MR200G1_Block.png)
+[Vehicle mirror controller](docs/AEK-MOT-MR200G1_Block.PNG)
 [Power liftgate controller](docs/AEK-MOT-TK200G1_Diagram.png)
 
 The AEK-MOT-MR200G1 {[picture](docs/AEK-MOT-MR200G1.png)} and AEK-MOT-TK200G1
