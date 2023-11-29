@@ -226,7 +226,7 @@ CSENSA-----TP29------>|PB0[D16/A2]     ~[D9]PC3|-------TP9--------->|PWMH1A  |
 #define DEBUG_LO()          digitalWrite(DEBUG_PIN, LOW)
 #define DEBUG_TOGL()        digitalWrite(DEBUG_PIN, !digitalRead(DEBUG_PIN))
 
-#define SPI_CLOCK           250000  //2000000         // 2 Mbps
+#define SPI_CLOCK           250000          // 250 Kbps
 #define CAN_SPEED           CAN_250KBPS
 
 DLK_MCP2515 Mcp2515(SPI_CLOCK, MCP2515_CS_PIN);
@@ -258,7 +258,7 @@ uint8_t TrunkTesState = TRUNK_UNLOCK;
 
 void L99DZ200G_Int(void)
 {
-    if (digitalRead(L99DZ200G_5V1_PIN) && digitalRead(L99DZ200G_NRST_PIN) && (!WatchdogRunning))
+    if (digitalRead(L99DZ200G_5V1_PIN) && digitalRead(L99DZ200G_NRST_PIN) && (!L99dz200g.L99DZ200G_WatchdogRunning()))
     {
         L99DZ200G_IntFlag = true;
     }
@@ -268,7 +268,7 @@ void L99DZ200G_Reset(void)
 {
     static bool in_reset_cnt = false;
 
-    if (digitalRead(L99DZ200G_5V1_PIN) && (!WatchdogRunning))
+    if (digitalRead(L99DZ200G_5V1_PIN) && (!L99dz200g.L99DZ200G_WatchdogRunning()))
     {
         if (in_reset_cnt)   // real L99DZ200G wake from VBAT_Standby reset
         {
@@ -430,7 +430,7 @@ void loop()
 
     new_prompt = CmdLine.DoCmdLine();
 
-    if (L99dz200g.L99DZ200G_CheckWdogExpired() && WatchdogRunning)  // process watchdog
+    if (L99dz200g.L99DZ200G_CheckWdogExpired() && L99dz200g.L99DZ200G_WatchdogRunning())  // process watchdog
     {
         gsb = L99dz200g.L99DZ200G_GlobalStatusByte();
         if (gsb != GSB_GSBN_MASK)
@@ -781,7 +781,7 @@ void DoHeartbeat(void)
         if (TIMER_EXPIRED(last_HB_tick, HEARTBEAT_ON_INTERVAL))
         {
             LED_off();      // off
-            if (OutHB && WatchdogRunning)
+            if (OutHB && L99dz200g.L99DZ200G_WatchdogRunning())
             {
                 L99dz200g.L99DZ200G_HSOutputsControl(OFF_OUT, OutHB);
             }
@@ -794,7 +794,7 @@ void DoHeartbeat(void)
         if (TIMER_EXPIRED(last_HB_tick, HEARTBEAT_OFF_INTERVAL))
         {
             LED_on();       // on
-            if (OutHB && WatchdogRunning)
+            if (OutHB && L99dz200g.L99DZ200G_WatchdogRunning())
             {
                 L99dz200g.L99DZ200G_HSOutputsControl(ON_OUT, OutHB);
             }
