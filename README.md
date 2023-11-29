@@ -45,17 +45,24 @@ Included Examples:
  
     Exercises the DLK_L99DZ200G Arduino library API for the L99DZ200G device on the AEK-MOT-MR200G1
     Vehicle mirror controller board and the AEK-MOT-TK200G1 Power liftgate controller board,
-    interactively using my Arduino **[CommandLine](https://github.com/dlkeng/Arduino_CommandLine)** library.
+    interactively using my Arduino **[CommandLine](https://github.com/dlkeng/Arduino_CommandLine)**
+    library.
 
  - **[MR200G1_Demo](examples/MR200G1_Demo):**
  
     Demos operation of the AEK-MOT-MR200G1 Vehicle mirror controller board with the
     DLK_L99DZ200G Arduino library for the L99DZ200G device, including CAN control
-    using an external MCP2515 CAN Controller Module.
+    using an external MCP2515 CAN Controller Module,
+    using my Arduino **[CommandLine](https://github.com/dlkeng/Arduino_CommandLine)**
+    and my Arduino **[DLK_MCP2515](https://github.com/dlkeng/Arduino_DLK_MCP2515)**
+    libraries.
 
  - **[TK200G1_Demo](examples/TK200G1_Demo):**
  
     Demos operation of the AEK-MOT-TK200G1 Power liftgate controller board with the
     DLK_L99DZ200G Arduino library for the L99DZ200G device, including CAN control
-    using an external MCP2515 CAN Controller Module.
- 
+    using an external MCP2515 CAN Controller Module,
+    using my Arduino **[CommandLine](https://github.com/dlkeng/Arduino_CommandLine)**
+    and my Arduino **[DLK_MCP2515](https://github.com/dlkeng/Arduino_DLK_MCP2515)**
+    libraries.
+
