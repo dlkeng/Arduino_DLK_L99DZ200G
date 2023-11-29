@@ -38,3 +38,22 @@ See [MR200/TK200](docs/MR200_TK200-MCU%20Wiring.pdf) showing the connections use
 this Arduino library with these boards.
 
 Doxygen-based HTML files for the library are in: **[API Docs](docs/html/class_d_l_k___l99_d_z200_g.html)**
+
+Included Examples:
+ - **[DLK_L99DZ200G_Library](examples/DLK_L99DZ200G_Library):**
+ 
+    Exercises the DLK_L99DZ200G Arduino library API for the L99DZ200G device on the AEK-MOT-MR200G1
+    Vehicle mirror controller board and the AEK-MOT-TK200G1 Power liftgate controller board.
+
+ - **[MR200G1_Demo](examples/MR200G1_Demo):**
+ 
+    Demos operation of the AEK-MOT-MR200G1 Vehicle mirror controller board with the
+    DLK_L99DZ200G Arduino library for the L99DZ200G device, including CAN control
+    using an external MCP2515 CAN Controller Module.
+
+ - **[TK200G1_Demo](examples/TK200G1_Demo):**
+ 
+    Demos operation of the AEK-MOT-TK200G1 Power liftgate controller board with the
+    DLK_L99DZ200G Arduino library for the L99DZ200G device, including CAN control
+    using an external MCP2515 CAN Controller Module.
+ 
