@@ -1311,7 +1311,7 @@ uint8_t L99DZ200G_Init(void)
 
     L99dz200g.L99DZ200G_SetWdogTime(WDOG_TIME_200MS);
 
-    WatchdogRunning = true;
+    L99dz200g.L99DZ200G_SetWatchdogRunning(true);
 
 #if 1   // for testing
     // Disable V1 load current supervision
@@ -2222,7 +2222,7 @@ int8_t Cmd_dir(int8_t argc, char * argv[])
 
     // If watchdog is not running, assumes L99DZ200G is in a standby mode
     // and should not be disturbed by SPI communications!
-    if (WatchdogRunning)
+    if (L99dz200g.L99DZ200G_WatchdogRunning())
     {
         Show_DIR_CM_DIR_States();
     }
@@ -9944,7 +9944,7 @@ int8_t Cmd_help(int8_t argc, char * argv[])
     CmdLine.ShowCommands();     // show commands menu with help information
 
     Serial.print(F("WatchdogRunning: "));
-    Serial.println(WatchdogRunning);
+    Serial.println(L99dz200g.L99DZ200G_WatchdogRunning());
 
     // Return success.
     return 0;
