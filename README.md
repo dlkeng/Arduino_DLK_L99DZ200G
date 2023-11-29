@@ -45,7 +45,7 @@ Included Examples:
  
     Exercises the DLK_L99DZ200G Arduino library API for the L99DZ200G device on the AEK-MOT-MR200G1
     Vehicle mirror controller board and the AEK-MOT-TK200G1 Power liftgate controller board,
-    interactively using my Arduino **[CommandLine](../Arduino_CommandLine)** library.
+    interactively using my Arduino **[CommandLine](https://github.com/dlkeng/Arduino_CommandLine)** library.
 
  - **[MR200G1_Demo](examples/MR200G1_Demo):**
  
