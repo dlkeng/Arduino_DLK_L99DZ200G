@@ -20,46 +20,13 @@
 #include "Arduino.h"
 #include "L99DZ200G.h"
 
-#if defined(ARDUINO_ARCH_RP2040) && defined(ARDUINO_ARCH_MBED_RP2040)
-#error "Unsupported MCU"
-#endif
-
-#if defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED_RP2040)
-#define PHILHOWER_RP2040    // Philhower Arduino for Raspberry Pi Pico/Pico W
-#endif
-
 #define TIMER_EXPIRED(start, interval)  ((millis() - start) >= interval)
-
-#define SPI0_NUM    0
-#define SPI1_NUM    1
 
 #define SPI_DUMMY_BYTE  0x00
 #define FRAME_CNT       4
 
-#ifdef __AVR__              // Nano
-    #define MAX_INTS    2
-#endif
-
-#ifdef PHILHOWER_RP2040     // Pi Pico
-    #define MAX_INTS    4
-#endif
-
-#ifdef TEENSYDUINO          // Teensy 3.1
-    #define MAX_INTS    4
-#endif
-
-#ifdef ESP8266              // ESP8266
-    #define MAX_INTS    0   // .usingInterrupt() not supported
-#endif
-
-#ifdef ESP32                // ESP32
-    #define MAX_INTS    0   // .usingInterrupt() not supported
-#endif
-
-extern bool WatchdogRunning;
-
 /**
- * DLK_L99DZ200G Arduino L99DZ200G driver library class. Version: "V1.0.0 10/25/2023"
+ * DLK_L99DZ200G Arduino L99DZ200G driver library class. Version: "V1.0.2 12/29/2023"
  */
 class DLK_L99DZ200G
 {
@@ -70,12 +37,10 @@ class DLK_L99DZ200G
          *
          *  \param spi_speed: the speed (bps) of the SPI interface to the L99DZ200G device
          *  \param cs_pin: the chip select Arduino pin (~CS) of the SPI interface to the L99DZ200G device
-         *  \param hw_cs_pin: true if using SPI HW CS (if supported), else false {optional}
-         *  \param which_spi: which SPI peripheral to use - \ref SPI0_NUM or \ref SPI1_NUM (always SPI0_NUM for AVR) {optional}
          *
          *  \return None.
          */
-        DLK_L99DZ200G(uint32_t spi_speed, uint8_t cs_pin, bool hw_cs_pin = false, uint8_t which_spi = SPI0_NUM);
+        DLK_L99DZ200G(uint32_t spi_speed, uint8_t cs_pin);
 
         /**
          * Initialize L99DZ200G.
@@ -1439,15 +1404,6 @@ class DLK_L99DZ200G
         uint8_t L99DZ200G_Get_WU_PinState(void);
 
 
-
-
-
-
-
-
-
-
-
         /**
          * Check if specified L99DZ200G register is writable.
          *
@@ -1465,32 +1421,31 @@ class DLK_L99DZ200G
          */
         uint8_t L99DZ200G_GlobalStatusByte(void);
 
-    private:
-        /// the SPI port to use (SPI0_NUM or SPI1_NUM)
-        uint8_t WhichSPI;
+        /**
+         * Set specified watchdog running state.
+         *
+         * \param wd_state: true = watchdog is running, false watchdog is not running
+         *
+         *  \return None.
+         */
+        void L99DZ200G_SetWatchdogRunning(bool wd_state);
 
+        /**
+         * Retrieve watchdog running state.
+         *
+         * @return bool  true = watchdog is running, false watchdog is not running
+         */
+        bool L99DZ200G_WatchdogRunning(void);
+
+    private:
         /// Pointer to SPI device
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
         SPIClass * SPI_dev;
-#endif
-#ifdef PHILHOWER_RP2040
-        SPIClassRP2040 * SPI_dev;
-#endif
 
         /// Flag for SPI initialization
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266)
         static bool SPI_initted;
-#endif
-#if defined(PHILHOWER_RP2040) || defined(ESP32)
-        static bool SPI0_initted;
-        static bool SPI1_initted;
-#endif
 
         /// Chip Select pin number
         uint8_t CS_pin;
-
-        /// HW Chip Select pin usage
-        bool HW_CS_pin;
 
         /// SPI configuration settings
         SPISettings SPI_Settings;
@@ -1503,6 +1458,9 @@ class DLK_L99DZ200G
 
         /// L99DZ200G watchdog tick value
         uint32_t WdogTick;
+
+        /// L99DZ200G watchdog running status
+        bool WatchdogRunning;
 
         /// Initiate L99DZ200G SPI transaction
         inline void L99DZ200G_StartSPI(void);

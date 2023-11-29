@@ -20,58 +20,25 @@
 
 // outside of DLK_L99DZ200G class
 
-bool WatchdogRunning = true;
-
-// private static class variable must be initialized outside of class
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266)
+// private static class variables must be initialized outside of class
 bool DLK_L99DZ200G::SPI_initted = false;
-#endif
-
-#if defined(PHILHOWER_RP2040) || defined(ESP32)
-bool DLK_L99DZ200G::SPI0_initted = false;
-bool DLK_L99DZ200G::SPI1_initted = false;
-#endif
-
-#if defined(ESP32)
-SPIClass SPIH = SPIClass(HSPI); // SPI1 appears to be used somewhere and crashes ESP32 code if used here!!!
-#endif
 
 // DLK_L99DZ200G Class members
 
 // Constructor
-DLK_L99DZ200G::DLK_L99DZ200G(uint32_t spi_speed, uint8_t cs_pin, bool hw_cs_pin, uint8_t which_spi)
+DLK_L99DZ200G::DLK_L99DZ200G(uint32_t spi_speed, uint8_t cs_pin)
 {
     CS_pin = cs_pin;
-    HW_CS_pin = hw_cs_pin;
-    WhichSPI = which_spi;
 
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
-    HW_CS_pin = false;
-#endif
-
-    if (HW_CS_pin)
-    {
-        // the following SPI mode is OK for SW CS
-        // the following SPI mode is needed by HW CS for continuous CS assertion during all bytes in a transaction
-        SPISettings spi_settings(spi_speed, MSBFIRST, SPI_MODE3);
-        SPI_Settings = spi_settings;
-    }
-    else    // SW CS
-    {
-        // the following SPI mode is OK for SW CS
-        // but for HW CS, with this SPI mode, the CS is only asserted separately for each byte in the transaction
-        SPISettings spi_settings(spi_speed, MSBFIRST, SPI_MODE0);
-        SPI_Settings = spi_settings;
-    }
+    SPISettings spi_settings(spi_speed, MSBFIRST, SPI_MODE0);
+    SPI_Settings = spi_settings;
+    WatchdogRunning = true;
 }
 
 // Initialize L99DZ200G
 uint8_t DLK_L99DZ200G::L99DZ200G_Init(void)
 {
-    uint8_t rslt = L99DZ200G_OK;
-
    // setup SPI
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266)
     SPI_dev = &SPI;
 
     if (!SPI_initted)
@@ -79,107 +46,34 @@ uint8_t DLK_L99DZ200G::L99DZ200G_Init(void)
         SPI_dev->begin();
         SPI_initted = true;
     }
-#endif
 
-#ifdef PHILHOWER_RP2040
-    if (WhichSPI == SPI1_NUM)
-    {
-        SPI_dev = &SPI1;        // SPI1
-    }
-    else    // SPI0_NUM
-    {
-        SPI_dev = &SPI;         // SPI0
-    }
+    pinMode(CS_pin, OUTPUT);
+    digitalWrite(CS_pin, HIGH);
 
-    if (SPI_dev == &SPI)
-    {
-        if (!SPI0_initted)
-        {
-            if (HW_CS_pin)
-            {
-                if (!SPI_dev->setCS(CS_pin))
-                {
-                    return L99DZ200G_FAIL;      // invalid CS pin for SPI port
-                }
-            }
-            SPI_dev->begin(HW_CS_pin);
-            SPI0_initted = true;
-        }
-    }
-    else if (SPI_dev == &SPI1)
-    {
-        if (!SPI1_initted)
-        {
-            if (HW_CS_pin)
-            {
-                if (!SPI_dev->setCS(CS_pin))
-                {
-                    return L99DZ200G_FAIL;      // invalid CS pin for SPI port
-                }
-            }
-            SPI_dev->begin(HW_CS_pin);
-            SPI1_initted = true;
-        }
-    }
-#endif
-
-#ifdef ESP32
-    if (WhichSPI == SPI1_NUM)
-    {
-        SPI_dev = &SPIH;        // HSPI
-    }
-    else    // SPI0_NUM
-    {
-        SPI_dev = &SPI;         // VSPI
-    }
-
-    if (SPI_dev == &SPI)
-    {
-        if (!SPI0_initted)
-        {
-            SPI_dev->begin(SCK, MISO, MOSI, CS_pin);
-            SPI0_initted = true;
-        }
-    }
-    else if (SPI_dev == &SPIH)
-    {
-        if (!SPI1_initted)
-        {
-            SPI_dev->begin();   // use default HSPI SPI pins
-            SPI1_initted = true;
-        }
-    }
-#endif
-
-    if (!HW_CS_pin)
-    {
-        pinMode(CS_pin, OUTPUT);
-        digitalWrite(CS_pin, HIGH);
-    }
-
-    return rslt;
+    return L99DZ200G_OK;
 }
 
 // Initiate L99DZ200G SPI transaction
 inline void DLK_L99DZ200G::L99DZ200G_StartSPI(void)
 {
     SPI_dev->beginTransaction(SPI_Settings);
-    if (!HW_CS_pin)
-    {
-        digitalWrite(CS_pin, LOW);
-    }
+    digitalWrite(CS_pin, LOW);
 }
 
 // Terminate L99DZ200G SPI transaction
 inline void DLK_L99DZ200G::L99DZ200G_EndSPI(void)
 {
-    if (!HW_CS_pin)
-    {
-        digitalWrite(CS_pin, HIGH);
-    }
+    digitalWrite(CS_pin, HIGH);
+
     SPI_dev->endTransaction();
+
 #ifdef TEENSYDUINO
-    delayMicroseconds(2);       // required delay between SPI transactions (not specified ???)
+    // required delay between SPI transactions (specified 6 uS min - Fig. 15)
+    delayMicroseconds(5);       // 6.5 uS @ 96 Mhz (overclock)
+//    delayMicroseconds(5);       // 6.5 uS @ 72 Mhz
+//    delayMicroseconds(5);       // 8.75 uS @ 48 Mhz
+//    delayMicroseconds(5);       // 7.0 uS @ 24 Mhz
+//    delayMicroseconds(5);       // 6.25 uS @ 120 Mhz
 #endif
 }
 
@@ -205,22 +99,12 @@ void ArrayToUint32(uint8_t * bytes, uint32_t * val)
 uint8_t DLK_L99DZ200G::L99DZ200G_ReadRomAddress(uint8_t addr)
 {
     uint8_t ret;
-
-    L99DZ200G_StartSPI();
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
     uint8_t spi_data[2] = { SPI_DUMMY_BYTE };
 
+    L99DZ200G_StartSPI();
     spi_data[0] = SET_SPI_DEV_INFO(addr);
     SPI_dev->transfer(spi_data, sizeof(spi_data));
     ret = spi_data[1];
-#else   // Raspberry Pi Pico
-    uint8_t spi_txdata[2] = { SPI_DUMMY_BYTE };
-    uint8_t spi_rxdata[2];
-
-    spi_txdata[0] = SET_SPI_DEV_INFO(addr);
-    SPI_dev->transfer(spi_txdata, spi_rxdata, sizeof(spi_txdata));
-    ret = spi_rxdata[1];
-#endif
     L99DZ200G_EndSPI();
 
     return ret;
@@ -230,24 +114,13 @@ uint8_t DLK_L99DZ200G::L99DZ200G_ReadRomAddress(uint8_t addr)
 uint32_t DLK_L99DZ200G::L99DZ200G_ReadRegister(uint8_t reg)
 {
     uint32_t ret;
-
-    L99DZ200G_StartSPI();
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
     uint8_t spi_data[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
 
+    L99DZ200G_StartSPI();
     spi_data[0] = SET_SPI_RD(reg);
     SPI_dev->transfer(spi_data, sizeof(spi_data));
     GlobalStatusRegister = spi_data[0];
     ArrayToUint32(spi_data, &ret);
-#else   // Raspberry Pi Pico
-    uint8_t spi_txdata[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
-    uint8_t spi_rxdata[SPI_TRANSACTION_SIZE];
-
-    spi_txdata[0] = SET_SPI_RD(reg);
-    SPI_dev->transfer(spi_txdata, spi_rxdata, sizeof(spi_txdata));
-    GlobalStatusRegister = spi_rxdata[0];
-    ArrayToUint32(spi_rxdata, &ret);
-#endif
     L99DZ200G_EndSPI();
 
     return ret;
@@ -256,23 +129,13 @@ uint32_t DLK_L99DZ200G::L99DZ200G_ReadRegister(uint8_t reg)
 // Write specified value to specified L99DZ200G Control register
 void DLK_L99DZ200G::L99DZ200G_WriteControlRegister(uint8_t reg, uint32_t val)
 {
-    L99DZ200G_StartSPI();
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
     uint8_t spi_data[SPI_TRANSACTION_SIZE];
 
+    L99DZ200G_StartSPI();
     Uint32ToArray(val, spi_data);
     spi_data[0] = SET_SPI_WR(reg);
     SPI_dev->transfer(spi_data, sizeof(spi_data));
     GlobalStatusRegister = spi_data[0];
-#else   // Raspberry Pi Pico
-    uint8_t spi_txdata[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
-    uint8_t spi_rxdata[SPI_TRANSACTION_SIZE];
-
-    Uint32ToArray(val, spi_txdata);
-    spi_txdata[0] = SET_SPI_WR(reg);
-    SPI_dev->transfer(spi_txdata, spi_rxdata, sizeof(spi_txdata));
-    GlobalStatusRegister = spi_rxdata[0];
-#endif
     L99DZ200G_EndSPI();
 }
 
@@ -295,23 +158,13 @@ void DLK_L99DZ200G::L99DZ200G_ModifyControlRegister(uint8_t reg, uint32_t mask, 
 // Read and clear specified bits in specified L99DZ200G register
 void DLK_L99DZ200G::L99DZ200G_ReadClearRegister(uint8_t reg, uint32_t mask)
 {
-    L99DZ200G_StartSPI();
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
     uint8_t spi_data[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
 
+    L99DZ200G_StartSPI();
     Uint32ToArray(mask, spi_data);
     spi_data[0] = SET_SPI_RD_CLR(reg);
     SPI_dev->transfer(spi_data, sizeof(spi_data));
     GlobalStatusRegister = spi_data[0];
-#else   // Raspberry Pi Pico
-    uint8_t spi_txdata[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
-    uint8_t spi_rxdata[SPI_TRANSACTION_SIZE];
-
-    Uint32ToArray(mask, spi_txdata);
-    spi_txdata[0] = SET_SPI_RD_CLR(reg);
-    SPI_dev->transfer(spi_txdata, spi_rxdata, sizeof(spi_txdata));
-    GlobalStatusRegister = spi_rxdata[0];
-#endif
     L99DZ200G_EndSPI();
 }
 
@@ -446,21 +299,12 @@ void DLK_L99DZ200G::L99DZ200G_ClearAllStatusRegisters(void)
 // Reset all L99DZ200G Control Registers to defaults
 void DLK_L99DZ200G::L99DZ200G_ResetAllControlRegisters(void)
 {
-    L99DZ200G_StartSPI();
-#if defined(__AVR__) || defined(TEENSYDUINO) || defined(ESP8266) || defined(ESP32)
     uint8_t spi_data[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
 
+    L99DZ200G_StartSPI();
     spi_data[0] = SET_SPI_DEV_INFO(L99DZ200G_CFR);
     SPI_dev->transfer(spi_data, sizeof(spi_data));
     GlobalStatusRegister = spi_data[0];
-#else   // Raspberry Pi Pico
-    uint8_t spi_txdata[SPI_TRANSACTION_SIZE] = { SPI_DUMMY_BYTE };
-    uint8_t spi_rxdata[SPI_TRANSACTION_SIZE];
-
-    spi_txdata[0] = SET_SPI_DEV_INFO(L99DZ200G_CFR);
-    SPI_dev->transfer(spi_txdata, spi_rxdata, sizeof(spi_txdata));
-    GlobalStatusRegister = spi_rxdata[0];
-#endif
     L99DZ200G_EndSPI();
 }
 
@@ -3937,5 +3781,17 @@ uint8_t DLK_L99DZ200G::L99DZ200G_CheckRegisterWritable(uint8_t reg)
 uint8_t DLK_L99DZ200G::L99DZ200G_GlobalStatusByte(void)
 {
     return GlobalStatusRegister;
+}
+
+// Set specified watchdog running state.
+void DLK_L99DZ200G::L99DZ200G_SetWatchdogRunning(bool wd_state)
+{
+    WatchdogRunning = wd_state;
+}
+
+// Retrieve watchdog running state
+bool DLK_L99DZ200G::L99DZ200G_WatchdogRunning(void)
+{
+    return WatchdogRunning;
 }
 
