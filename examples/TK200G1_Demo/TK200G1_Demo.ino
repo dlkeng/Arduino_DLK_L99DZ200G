@@ -254,7 +254,7 @@ uint16_t TrunkDelay = 1000;         // mS
 uint8_t TrunkPwmDutyCycle = 50;     // %
 uint8_t TrunkState = TRUNK_STOP;
 bool TrunkTesting = false;
-uint8_t TrunkTesState = TRUNK_UNLOCK;
+uint8_t TrunkTestState = TRUNK_UNLOCK;
 
 void L99DZ200G_Int(void)
 {
@@ -693,7 +693,7 @@ void RunTrunkLiftgateTestOperations(void)
 
     last_trunk_tick = millis();
 
-    switch (TrunkTesState)
+    switch (TrunkTestState)
     {
         case TRUNK_UNLOCK:
             // lights on, trunk unlock
@@ -701,7 +701,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLightsControl(ON_OUT);
             TrunkUnlock(TrunkPwmDutyCycle);
             ms_delay = 3000;
-            TrunkTesState = TRUNK_WAIT1;
+            TrunkTestState = TRUNK_WAIT1;
             break;
 
         case TRUNK_WAIT1:
@@ -710,7 +710,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLockStop();
             TrunkLightsControl(OFF_OUT);
             ms_delay = 1000;
-            TrunkTesState = TRUNK_OPEN;
+            TrunkTestState = TRUNK_OPEN;
             break;
 
         case TRUNK_OPEN:
@@ -719,7 +719,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLightsControl(ON_OUT);
             TrunkLiftOpen(TrunkPwmDutyCycle);
             ms_delay = 3000;
-            TrunkTesState = TRUNK_WAIT2;
+            TrunkTestState = TRUNK_WAIT2;
             break;
 
         case TRUNK_WAIT2:
@@ -728,7 +728,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLiftStop();
             TrunkLightsControl(OFF_OUT);
             ms_delay = 3000;
-            TrunkTesState = TRUNK_CLOSE;
+            TrunkTestState = TRUNK_CLOSE;
             break;
 
         case TRUNK_CLOSE:
@@ -737,7 +737,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLightsControl(ON_OUT);
             TrunkLiftClose(TrunkPwmDutyCycle);
             ms_delay = 3000;
-            TrunkTesState = TRUNK_WAIT3;
+            TrunkTestState = TRUNK_WAIT3;
             break;
 
         case TRUNK_WAIT3:
@@ -746,7 +746,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLiftStop();
             TrunkLightsControl(OFF_OUT);
             ms_delay = 1000;
-            TrunkTesState = TRUNK_LOCK;
+            TrunkTestState = TRUNK_LOCK;
             break;
 
         case TRUNK_LOCK:
@@ -755,7 +755,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLightsControl(ON_OUT);
             TrunkLock(TrunkPwmDutyCycle);
             ms_delay = 3000;
-            TrunkTesState = TRUNK_WAIT4;
+            TrunkTestState = TRUNK_WAIT4;
             break;
 
         case TRUNK_WAIT4:
@@ -765,7 +765,7 @@ void RunTrunkLiftgateTestOperations(void)
             TrunkLightsControl(OFF_OUT);
             ms_delay = 10000;
 //TrunkTesting = false;
-            TrunkTesState = TRUNK_UNLOCK;   // repeat
+            TrunkTestState = TRUNK_UNLOCK;   // repeat
             break;
     }
 }
