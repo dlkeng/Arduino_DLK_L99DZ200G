@@ -69,11 +69,18 @@ inline void DLK_L99DZ200G::L99DZ200G_EndSPI(void)
 
 #ifdef TEENSYDUINO
     // required delay between SPI transactions (specified 6 uS min - Fig. 15)
-    delayMicroseconds(5);       // 6.5 uS @ 96 Mhz (overclock)
-//    delayMicroseconds(5);       // 6.5 uS @ 72 Mhz
-//    delayMicroseconds(5);       // 8.75 uS @ 48 Mhz
-//    delayMicroseconds(5);       // 7.0 uS @ 24 Mhz
-//    delayMicroseconds(5);       // 6.25 uS @ 120 Mhz
+    delayMicroseconds(5);   // = 6.5 uS
+
+    // without above delay:
+    // @ 120 Mhz (overclock) = 1.2 uS       - fails
+    // @ 96 Mhz (overclock) = 1.3 uS        - fails
+    // @ 72 Mhz = 1.6 uS                    - fails
+    // @ 48 Mhz = 2 uS                      - fails
+    // @ 24 Mhz = 3.6 uS                    - appears to work
+    // @ 16 Mhz = 5.4 uS                    - appears to work
+    // @ 8 Mhz = 10 uS                      - works
+    // @ 4 Mhz = 47 uS                      - works
+    // @ 2 Mhz = 56 uS                      - works
 #endif
 }
 
