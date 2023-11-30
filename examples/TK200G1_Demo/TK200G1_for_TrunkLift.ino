@@ -186,18 +186,7 @@ void SetTrunkHBridgePwmSetting(uint8_t which, uint8_t pwm)
 
     HBridgePWM[which] = pwm;
     pwm_dc = map(pwm, 0, 100, 0, 255);
-    if (pwm == 0)
-    {
-        digitalWrite(pwm_pin, LOW);
-    }
-    else if (pwm == 100)
-    {
-        digitalWrite(pwm_pin, HIGH);
-    }
-    else
-    {
-        analogWrite(pwm_pin, pwm_dc);
-    }
+    analogWrite(pwm_pin, pwm_dc);
 }
 
 /**
@@ -224,6 +213,9 @@ void TrunkLiftStop(void)
     TrunkEnableHB(TRUNK_STOP);
     SetTrunkHBridgePwmSetting(HB_PWMH1A, 0);
     SetTrunkHBridgePwmSetting(HB_PWMH2B, 0);
+
+    SetTrunkHBridgePwmSetting(HB_PWMH1B, 0);
+    SetTrunkHBridgePwmSetting(HB_PWMH2A, 0);
 }
 
 /**
@@ -262,6 +254,9 @@ void TrunkLockStop(void)
     TrunkEnableHB(TRUNK_STOP);
     SetTrunkHBridgePwmSetting(HB_PWMH1B, 0);
     SetTrunkHBridgePwmSetting(HB_PWMH2A, 0);
+
+    SetTrunkHBridgePwmSetting(HB_PWMH1A, 0);
+    SetTrunkHBridgePwmSetting(HB_PWMH2B, 0);
 }
 
 /**

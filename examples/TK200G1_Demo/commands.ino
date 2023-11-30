@@ -135,7 +135,7 @@ const char MenuHelpHb[] PROGMEM    =  " [AB [on | off] | [mode  [sng | dual]] | 
 const char MenuHelpHbm[] PROGMEM   =   " [AB [spd% [L | R]]]          : Show[set] L99DZ200G H-Bridge motor control";
 #endif
 #ifdef SHOW_TRUNK
-const char MenuHelpTrunk[] PROGMEM =     " open | close | lock | unlock | stop | test | delay val: Do TK200G1 trunk control";
+const char MenuHelpTrunk[] PROGMEM =     " open | close | lock | unlock | stop | test | pwm %val | delay val: Do TK200G1 trunk control";
 #endif
 
 //*****************************************************************************
@@ -2170,6 +2170,7 @@ int8_t Cmd_hb(int8_t argc, char * argv[])
     else if (argc < 2)
     {
         ShowHBridgeSettings(H_BRIDGE_CONTROL_A);
+        Serial.println();
         ShowHBridgeSettings(H_BRIDGE_CONTROL_B);
     }
     else
@@ -2805,40 +2806,14 @@ void SetHBridgePwmSetting(uint8_t hbridge, uint8_t pwm)
         case H_BRIDGE_CONTROL_A:
             HBridgePWM[hbridge * 2] = pwm;
             HBridgePWM[(hbridge * 2) + 1] = pwm;
-            if (pwm == 0)
-            {
-                digitalWrite(L99DZ200G_PWMH1A_PIN, LOW);
-                digitalWrite(L99DZ200G_PWMH2A_PIN, LOW);
-            }
-            else if (pwm == 100)
-            {
-                digitalWrite(L99DZ200G_PWMH1A_PIN, HIGH);
-                digitalWrite(L99DZ200G_PWMH2A_PIN, HIGH);
-            }
-            else
-            {
-                analogWrite(L99DZ200G_PWMH1A_PIN, pwm_dc);
-                analogWrite(L99DZ200G_PWMH2A_PIN, pwm_dc);
-            }
+            analogWrite(L99DZ200G_PWMH1A_PIN, pwm_dc);
+            analogWrite(L99DZ200G_PWMH2A_PIN, pwm_dc);
             break;
         case H_BRIDGE_CONTROL_B:
             HBridgePWM[hbridge * 2] = pwm;
             HBridgePWM[(hbridge * 2) + 1] = pwm;
-            if (pwm == 0)
-            {
-                digitalWrite(L99DZ200G_PWMH1B_PIN, LOW);
-                digitalWrite(L99DZ200G_PWMH2B_PIN, LOW);
-            }
-            else if (pwm == 100)
-            {
-                digitalWrite(L99DZ200G_PWMH1B_PIN, HIGH);
-                digitalWrite(L99DZ200G_PWMH2B_PIN, HIGH);
-            }
-            else
-            {
-                analogWrite(L99DZ200G_PWMH1B_PIN, pwm_dc);
-                analogWrite(L99DZ200G_PWMH2B_PIN, pwm_dc);
-            }
+            analogWrite(L99DZ200G_PWMH1B_PIN, pwm_dc);
+            analogWrite(L99DZ200G_PWMH2B_PIN, pwm_dc);
             break;
     }
 }
@@ -2926,6 +2901,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
     Serial.print(reg_cfr ? "Dual" : "Single");
     Serial.println();
 
+#if 0
     // show H-Bridge DS_MON_x state
     Serial.print(F(" DS_MON_"));
     switch (hbridge)
@@ -2986,6 +2962,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
     Serial.print(reg);
     Serial.print(F(" mV"));
     Serial.println();
+#endif
 
     // show H-Bridge SD_x state
     Serial.print(F(" SD_"));
@@ -3025,6 +3002,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
     }
     Serial.println();
 
+#if 0
     // show H-Bridge H_OLTH_HIGH_x state
     Serial.print(F(" H_OLTH_HIGH_"));
     switch (hbridge)
@@ -3041,6 +3019,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
     Serial.print(reg ? '5' : '1');
     Serial.print(F("/6 VS"));
     Serial.println();
+#endif
 
     // show H-Bridge DIRH_x state
     Serial.print(F(" DIRH"));
@@ -3058,6 +3037,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
     Serial.print(reg ? "Right" : "Left");
     Serial.println();
 
+#if 0
     // show H-Bridge OL_H1L2_x and OL_H2L1_x states
     Serial.print(F(" OL_H1L2_"));
     switch (hbridge)
@@ -3098,6 +3078,7 @@ void ShowHBridgeSettings(uint8_t hbridge)
         Serial.print(((reg + 1) * 100) / SLEW_MAX);
         Serial.println(F("%"));
     }
+#endif
 
     // show H-Bridge PWM duty cycle
     Serial.print(F(" PWM_"));
@@ -3163,6 +3144,7 @@ int8_t Cmd_hbm(int8_t argc, char * argv[])
     else if (argc < 2)
     {
         ShowHBridgeMotorSettings(H_BRIDGE_CONTROL_A);
+        Serial.println();
         ShowHBridgeMotorSettings(H_BRIDGE_CONTROL_B);
     }
     else
@@ -3394,6 +3376,10 @@ void ShowHBridgeMotorSettings(uint8_t hbridge)
  *      -or-
  *   <test> = run trunk liftgate test operations
  *      -or-
+ *   <pwm>  = operational PWM duty cycle (%)
+ *      -and-
+ *     %val = PWM duty cycle value (%)
+ *      -or-
  *   <delay> = trunk liftgate open/close or lock/unlock operational delay (mS)
  *      -and-
  *     val   = delay value (mS)
@@ -3405,6 +3391,7 @@ void ShowHBridgeMotorSettings(uint8_t hbridge)
  *     "trunk unlock"       - unlock trunk liftgate
  *     "trunk stop"         - stop trunk liftgate open/close or lock/unlock
  *     "trunk test"         - run trunk liftgate test operations
+ *     "trunk pwm 50"       - trunk liftgate operational PWM duty cycle of 50%
  *     "trunk delay 1000"   - trunk liftgate operational delay of 1000 mS
  *
  * RETURN VALUES:
@@ -3435,6 +3422,17 @@ int8_t Cmd_trunk(int8_t argc, char * argv[])
                 return CMDLINE_INVALID_ARG;
             }
             TrunkDelay = val;
+        }
+        else if (strcmp_P(argv[ARG1], PSTR("pwm")) == 0)
+        {
+            // get the operating PWM duty cycl
+            paramtype = CmdLine.ParseParam(argv[ARG2], &val);
+            if ((paramtype == BADPARAM) || (paramtype == STRVAL) ||
+                (val < 0) || (val > 100))
+            {
+                return CMDLINE_INVALID_ARG;
+            }
+            TrunkPwmDutyCycle = val;
         }
         else if (argc > 2)
         {
@@ -3562,10 +3560,11 @@ void ShowTrunkState(void)
             Serial.println(F("TEST"));
             break;
     }
+    Serial.print(F("TrunkPwmDutyCycle: "));
+    Serial.print(TrunkPwmDutyCycle);
+    Serial.println('%');
 }
 #endif
-
-
 
 
 /*
