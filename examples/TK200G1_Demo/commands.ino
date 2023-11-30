@@ -3528,7 +3528,7 @@ void DoTrunkOperation(uint8_t cmd)
             break;
         case TRUNK_TEST:
             TrunkTesting = true;
-            TrunkTesState = TRUNK_UNLOCK;
+            TrunkTestState = TRUNK_UNLOCK;
             break;
     }
 
