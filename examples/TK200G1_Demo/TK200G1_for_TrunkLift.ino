@@ -76,6 +76,7 @@ void TrunkDualMotorMode(uint8_t trunk_cmd)
  */
 void TrunkConfiguration(uint8_t trunk_cmd)
 {
+//#define USE_ORIGINAL_VALS
     switch (trunk_cmd)
     {
         case TRUNK_OPEN:    // M1 = Single (H1A-L2A), M2 = Dual (H2B-L2A), M3 = off Dual (H1B/L1B)
@@ -88,12 +89,17 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             // SDS2A = 0    Dual Active freewheeling LS
             // SD 1A = 0
             // SDS1A = 0    Dual Active freewheeling LS, Single Active freewheeling LS1 and LS2 on
+#ifdef USE_ORIGINAL_VALS
+            L99dz200g.L99DZ200G_ModifyControlRegister(L99DZ200G_CR10, 0x0FF000, 0x010000);
+#else
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG2, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG2, ACTIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG1, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG1, ACTIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_SingleMotorFreewheelingSide(H_BRIDGE_CONTROL_A, LOW_SIDE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_SingleMotorFreewheelingType(H_BRIDGE_CONTROL_A, ACTIVE_FREEWHEELING);
+#endif
+ShowReg(L99DZ200G_CR10);
             break;
 
         case TRUNK_CLOSE:   // M1 = Single (H2A-L1A), M2 = Dual (H1A-L2B), M3 = off Dual (H1B/L1B)
@@ -106,12 +112,17 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             // SDS2A = 0    Dual Active freewheeling LS
             // SD 1A = 1
             // SDS1A = 0    Dual Active freewheeling HS, Single Active freewheeling HS1 and HS2 on
+#ifdef USE_ORIGINAL_VALS
+            L99dz200g.L99DZ200G_ModifyControlRegister(L99DZ200G_CR10, 0x0FF000, 0x092000);
+#else
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG2, HIGH_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG2, ACTIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG1, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG1, PASSIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_SingleMotorFreewheelingSide(H_BRIDGE_CONTROL_A, HIGH_SIDE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_SingleMotorFreewheelingType(H_BRIDGE_CONTROL_A, ACTIVE_FREEWHEELING);
+#endif
+ShowReg(L99DZ200G_CR10);
             break;
 
         case TRUNK_LOCK:    // M1 = off Dual, M2 = off Dual, M3 = Dual (H1B-L2A)
@@ -124,6 +135,9 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             // SDS2A = 0    Dual Active freewheeling HS
             // SD 1A = 0
             // SDS1A = 1    Dual Passive freewheeling LS, Single Passive freewheeling through LS1/LS2 diode
+#ifdef USE_ORIGINAL_VALS
+            L99dz200g.L99DZ200G_ModifyControlRegister(L99DZ200G_CR10, 0x0FF000, 0x049000);
+#else
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG2, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG2, PASSIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG1, LOW_SIDE_DRIVE);
@@ -132,6 +146,8 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_A, HB_LEG2, ACTIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_A, HB_LEG1, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_A, HB_LEG1, PASSIVE_FREEWHEELING);
+#endif
+ShowReg(L99DZ200G_CR10);
             break;
 
         case TRUNK_UNLOCK:  // M1 = off Dual, M2 = off Dual, M3 = Dual (H2A-L1B)
@@ -144,6 +160,9 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             // SDS2A = 0    Dual Active freewheeling LS
             // SD 1A = 0
             // SDS1A = 1    Dual Passive freewheeling LS, Single Passive freewheeling through LS1/LS2 diode
+#ifdef USE_ORIGINAL_VALS
+            L99dz200g.L99DZ200G_ModifyControlRegister(L99DZ200G_CR10, 0x0FF000, 0x061000);
+#else
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG2, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_B, HB_LEG2, PASSIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_B, HB_LEG1, HIGH_SIDE_DRIVE);
@@ -152,6 +171,8 @@ void TrunkConfiguration(uint8_t trunk_cmd)
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_A, HB_LEG2, ACTIVE_FREEWHEELING);
             L99dz200g.L99DZ200G_Set_HB_DualMotorDrive(H_BRIDGE_CONTROL_A, HB_LEG1, LOW_SIDE_DRIVE);
             L99dz200g.L99DZ200G_Set_HB_DualMotorFreewheelingType(H_BRIDGE_CONTROL_A, HB_LEG1, PASSIVE_FREEWHEELING);
+#endif
+ShowReg(L99DZ200G_CR10);
             break;
 
         default:
@@ -186,7 +207,18 @@ void SetTrunkHBridgePwmSetting(uint8_t which, uint8_t pwm)
 
     HBridgePWM[which] = pwm;
     pwm_dc = map(pwm, 0, 100, 0, 255);
+#if 1
+    if (pwm)
+    {
+        digitalWrite(pwm_pin, HIGH);
+    }
+    else
+    {
+        digitalWrite(pwm_pin, LOW);
+    }
+#else
     analogWrite(pwm_pin, pwm_dc);
+#endif
 }
 
 /**
