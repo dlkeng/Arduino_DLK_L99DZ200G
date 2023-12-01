@@ -2036,6 +2036,14 @@ void PulseWake(void)
  *
  *      -or-
  *
+ *   <mode> = set motor mode of specified L99DZ200G H-bridge
+ *      -and-
+ *   <sng>  = set single motor mode for H-bridge
+ *      -or-
+ *   <dual> = set dual motor mode for  H-bridge
+ *
+ *      -or-
+ *
  *   <clrds> = clear Drain-Source monitoring status for specified L99DZ200G H-bridge
  *
  *      -or-
@@ -2076,6 +2084,12 @@ void PulseWake(void)
  *
  *      -or-
  *
+ *   <pwm> = set PWM duty cycle for specified L99DZ200G H-bridge
+ *      -and-
+ *   <n%>  = the PWM duty cycle (0 to 100%)
+ *
+ *      -or-
+ *
  *   <smdir> = set single motor mode Direction of specified L99DZ200G H-bridge
  *      -and-
  *   <L>  = set single motor mode Direction left
@@ -2112,28 +2126,22 @@ void PulseWake(void)
  *      -or-
  *   <off> = disable open-load H-bridge testing
  *
- *      -or-
- *
- *   <mode> = set motor mode of specified L99DZ200G H-bridge
- *      -and-
- *   <sng>  = set single motor mode for H-bridge
- *      -or-
- *   <dual> = set dual motor mode for  H-bridge
- *
  *      1  2  3    4   5
  *     "hb A"                - show L99DZ200G H-Bridge A settings
+ *     "hb A on"             - set L99DZ200G H-Bridge A control on
+ *     "hb B mode dual"      - set L99DZ200G H-Bridge B to dual motor mode
  *     "hb A clrds"          - clear L99DZ200G H-Bridge A Drain-Source monitoring status
  *     "hb A ccpt 1250ns"    - set L99DZ200G H-Bridge A cross current protection time to 1250 nS
  *     "hb A dsth 750mv"     - set L99DZ200G H-Bridge A Drain-Source threshold voltage to 750 mV
  *     "hb A dmside 1 L"     - set L99DZ200G H-Bridge A dual motor mode drive side leg 1 low side
  *     "hb A dmtype 2 P"     - set L99DZ200G H-Bridge A dual motor mode freewheeling type leg 2 passive
  *     "hb B olht on"        - set L99DZ200G H-Bridge B Open-Load high threshold on
+ *     "hb A pwm 55"         - set L99DZ200G H-Bridge A PWM duty cycle to 55%
  *     "hb B smdir L"        - set L99DZ200G H-Bridge B single motor mode Direction left
  *     "hb B smside H"       - set L99DZ200G H-Bridge B single motor mode freewheeling side to high side
  *     "hb B smtype A"       - set L99DZ200G H-Bridge B single motor mode freewheeling to active
  *     "hb B slew 50"        - set L99DZ200G H-Bridge B slew rate current percentage to 50%
  *     "hb B oltst h2l1 on"  - enable test open-load condition between H2 and L1
- *     "hb B mode dual"      - set L99DZ200G H-Bridge B to dual motor mode
  *
  * RETURN VALUES:
  *  int8_t = 0 = command successfully processed
@@ -3034,7 +3042,22 @@ void ShowHBridgeSettings(uint8_t hbridge)
             Serial.print(F("B: "));
             break;
     }
-    Serial.print(reg ? "Right" : "Left");
+    if (reg)
+    {
+        Serial.print(F("Right"));
+        if (!reg_cfr)
+        {
+            Serial.print(F(" (H1/L2 on)"));
+        }
+    }
+    else
+    {
+        Serial.print(F("Left"));
+        if (!reg_cfr)
+        {
+            Serial.print(F(" (H2/L1 on)"));
+        }
+    }
     Serial.println();
 
 #if 0
@@ -3563,6 +3586,9 @@ void ShowTrunkState(void)
     Serial.print(F("TrunkPwmDutyCycle: "));
     Serial.print(TrunkPwmDutyCycle);
     Serial.println('%');
+    Serial.print(F("TrunkDelay: "));
+    Serial.print(TrunkDelay);
+    Serial.println(F(" mS"));
 }
 #endif
 
