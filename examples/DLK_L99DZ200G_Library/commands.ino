@@ -53,7 +53,7 @@
 //#define SHOW_VSR
 //#define SHOW_WAKEUP
 //#define SHOW_WDOG
-//#define SHOW_HBRIDGE
+#define SHOW_HBRIDGE
 
 // local function prototypes
 int8_t Cmd_help(int8_t argc, char * argv[]);
@@ -4386,7 +4386,7 @@ void ShowOpenLoadThresholdSetting(uint8_t output)
  *  char * argv[] = pointer to array of parameters associated with the command
  *
  * WHAT:
- *  Implements the "out" command to show/set OUT7, OUT8, OUT9, OUT13, OUT14, or OUT15 output control.
+ *  Implements the "out" command to show/set OUT7, OUT8, OUT9, OUT10, OUT13, OUT14, or OUT15 output control.
  *
  *  One optional parameter supported.
  *   <off> = set OUTn output state off
@@ -8562,6 +8562,14 @@ void ShowLSx_FSO_ForcedStateControl(void)
  *
  *      -or-
  *
+ *   <mode> = set motor mode of specified L99DZ200G H-bridge
+ *      -and-
+ *   <sng>  = set single motor mode for H-bridge
+ *      -or-
+ *   <dual> = set dual motor mode for  H-bridge
+ *
+ *      -or-
+ *
  *   <clrds> = clear Drain-Source monitoring status for specified L99DZ200G H-bridge
  *
  *      -or-
@@ -8602,6 +8610,12 @@ void ShowLSx_FSO_ForcedStateControl(void)
  *
  *      -or-
  *
+ *   <pwm> = set PWM duty cycle for specified L99DZ200G H-bridge
+ *      -and-
+ *   <n%>  = the PWM duty cycle (0 to 100%)
+ *
+ *      -or-
+ *
  *   <smdir> = set single motor mode Direction of specified L99DZ200G H-bridge
  *      -and-
  *   <L>  = set single motor mode Direction left
@@ -8638,28 +8652,22 @@ void ShowLSx_FSO_ForcedStateControl(void)
  *      -or-
  *   <off> = disable open-load H-bridge testing
  *
- *      -or-
- *
- *   <mode> = set motor mode of specified L99DZ200G H-bridge
- *      -and-
- *   <sng>  = set single motor mode for H-bridge
- *      -or-
- *   <dual> = set dual motor mode for  H-bridge
- *
  *      1  2  3    4   5
  *     "hb A"                - show L99DZ200G H-Bridge A settings
+ *     "hb A on"             - set L99DZ200G H-Bridge A control on
+ *     "hb B mode dual"      - set L99DZ200G H-Bridge B to dual motor mode
  *     "hb A clrds"          - clear L99DZ200G H-Bridge A Drain-Source monitoring status
  *     "hb A ccpt 1250ns"    - set L99DZ200G H-Bridge A cross current protection time to 1250 nS
  *     "hb A dsth 750mv"     - set L99DZ200G H-Bridge A Drain-Source threshold voltage to 750 mV
  *     "hb A dmside 1 L"     - set L99DZ200G H-Bridge A dual motor mode drive side leg 1 low side
  *     "hb A dmtype 2 P"     - set L99DZ200G H-Bridge A dual motor mode freewheeling type leg 2 passive
  *     "hb B olht on"        - set L99DZ200G H-Bridge B Open-Load high threshold on
+ *     "hb A pwm 55"         - set L99DZ200G H-Bridge A PWM duty cycle to 55%
  *     "hb B smdir L"        - set L99DZ200G H-Bridge B single motor mode Direction left
  *     "hb B smside H"       - set L99DZ200G H-Bridge B single motor mode freewheeling side to high side
  *     "hb B smtype A"       - set L99DZ200G H-Bridge B single motor mode freewheeling to active
  *     "hb B slew 50"        - set L99DZ200G H-Bridge B slew rate current percentage to 50%
  *     "hb B oltst h2l1 on"  - enable test open-load condition between H2 and L1
- *     "hb B mode dual"      - set L99DZ200G H-Bridge B to dual motor mode
  *
  * RETURN VALUES:
  *  int8_t = 0 = command successfully processed
@@ -8696,6 +8704,7 @@ int8_t Cmd_hb(int8_t argc, char * argv[])
     else if (argc < 2)
     {
         ShowHBridgeSettings(H_BRIDGE_CONTROL_A);
+        Serial.println();
         ShowHBridgeSettings(H_BRIDGE_CONTROL_B);
     }
     else
@@ -9331,40 +9340,14 @@ void SetHBridgePwmSetting(uint8_t hbridge, uint8_t pwm)
         case H_BRIDGE_CONTROL_A:
             HBridgePWM[hbridge * 2] = pwm;
             HBridgePWM[(hbridge * 2) + 1] = pwm;
-            if (pwm == 0)
-            {
-                digitalWrite(L99DZ200G_PWMH1A_PIN, LOW);
-                digitalWrite(L99DZ200G_PWMH2A_PIN, LOW);
-            }
-            else if (pwm == 100)
-            {
-                digitalWrite(L99DZ200G_PWMH1A_PIN, HIGH);
-                digitalWrite(L99DZ200G_PWMH2A_PIN, HIGH);
-            }
-            else
-            {
-                analogWrite(L99DZ200G_PWMH1A_PIN, pwm_dc);
-                analogWrite(L99DZ200G_PWMH2A_PIN, pwm_dc);
-            }
+            analogWrite(L99DZ200G_PWMH1A_PIN, pwm_dc);
+            analogWrite(L99DZ200G_PWMH2A_PIN, pwm_dc);
             break;
         case H_BRIDGE_CONTROL_B:
             HBridgePWM[hbridge * 2] = pwm;
             HBridgePWM[(hbridge * 2) + 1] = pwm;
-            if (pwm == 0)
-            {
-                digitalWrite(L99DZ200G_PWMH1B_PIN, LOW);
-                digitalWrite(L99DZ200G_PWMH2B_PIN, LOW);
-            }
-            else if (pwm == 100)
-            {
-                digitalWrite(L99DZ200G_PWMH1B_PIN, HIGH);
-                digitalWrite(L99DZ200G_PWMH2B_PIN, HIGH);
-            }
-            else
-            {
-                analogWrite(L99DZ200G_PWMH1B_PIN, pwm_dc);
-                analogWrite(L99DZ200G_PWMH2B_PIN, pwm_dc);
-            }
+            analogWrite(L99DZ200G_PWMH1B_PIN, pwm_dc);
+            analogWrite(L99DZ200G_PWMH2B_PIN, pwm_dc);
             break;
     }
 }
@@ -9581,7 +9564,22 @@ void ShowHBridgeSettings(uint8_t hbridge)
             Serial.print(F("B: "));
             break;
     }
-    Serial.print(reg ? "Right" : "Left");
+    if (reg)
+    {
+        Serial.print(F("Right"));
+        if (!reg_cfr)
+        {
+            Serial.print(F(" (H1/L2 on)"));
+        }
+    }
+    else
+    {
+        Serial.print(F("Left"));
+        if (!reg_cfr)
+        {
+            Serial.print(F(" (H2/L1 on)"));
+        }
+    }
     Serial.println();
 
     // show H-Bridge OL_H1L2_x and OL_H2L1_x states
@@ -9689,6 +9687,7 @@ int8_t Cmd_hbm(int8_t argc, char * argv[])
     else if (argc < 2)
     {
         ShowHBridgeMotorSettings(H_BRIDGE_CONTROL_A);
+        Serial.println();
         ShowHBridgeMotorSettings(H_BRIDGE_CONTROL_B);
     }
     else
